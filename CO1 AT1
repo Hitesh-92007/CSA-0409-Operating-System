@@ -1,0 +1,128 @@
+question 1
+a. identify the type of operating system suitable for this environment and justify your answer.
+the most suitable operating system for this environment is a multi-user operating system. it allows many students to use the same linux server at the same time. each student can run their own programs without affecting the work of other students. the operating system shares the cpu, memory, and other resources among all users, making it suitable for a university computer laboratory.
+b. state any two responsibilities of the kernel in managing multiple user processes.
+the kernel is responsible for managing different processes running in the system. one responsibility is process management, where it creates, schedules, and stops processes while deciding which process should use the cpu. another responsibility is memory management, where it gives memory to each process and makes sure that one process cannot access the memory of another process.
+c. write a c-based system call sequence (or pseudo-code) to create a child process and display the process ids of both the parent and child.
+#include <stdio.h>
+#include <unistd.h>
+
+int main()
+{
+    pid_t pid;
+
+    pid = FORK();
+
+    if(pid == 0)
+    {
+        printf("child process id: %d", GETPID());
+    }
+    else
+    {
+        printf("parent process id: %d", GETPID());
+    }
+
+    return 0
+
+question 2
+a. list the system calls required for file creation, writing, reading, and closing.
+the system calls needed are OPEN(), WRITE(), READ(), and CLOSE(). OPEN() is used to create or open a file, WRITE() is used to write data into the file, READ() is used to read the contents of the file, and CLOSE() is used to close the file after the work is completed.
+b. explain the purpose of any two file management system calls.
+the OPEN() system call is used to create a new file or open an existing file so that it can be used for reading or writing. the WRITE() system call is used to store data inside the file. these system calls help the operating system manage files properly and safely.
+c. write a c-based system call sequence (or pseudo-code) to create a file, write a student name, and close the file.
+#include <fcntl.h>
+#include <unistd.h>
+
+int main()
+{
+    int fd;
+
+    fd = OPEN("student.txt", O_CREAT | O_WRONLY, 0644);
+
+    WRITE(fd, "krishna gupta", 13);
+
+    CLOSE(fd);
+
+    return 0;
+
+question 3
+a. list the system calls required to complete this operation.
+to copy the contents of one file to another, the required system calls are OPEN(), READ(), WRITE(), and CLOSE(). these system calls are used to open both files, read data from the source file, write it into the destination file, and finally close both files.
+b. explain the purpose of any two of these system calls.
+the READ() system call is used to read the contents of a file and store them in a memory buffer. the WRITE() system call is used to write the data stored in the buffer into another file. together, these system calls make it possible to copy data from one file to another.
+c. write a pseudo-code or c-based system call sequence to copy the contents of one file to another.
+#include <fcntl.h>
+#include <unistd.h>
+
+int main()
+{
+    int source, destination;
+    char buffer[100];
+    int n;
+
+    source = OPEN("file1.txt", O_RDONLY);
+
+    destination = OPEN("file2.txt", O_CREAT | O_WRONLY, 0644);
+
+    n = READ(source, buffer, 100);
+
+    WRITE(destination, buffer, n);
+
+    CLOSE(source);
+    CLOSE(destination);
+
+    return 0;
+}
+question 4
+a. state the purpose of the FORK() and EXEC() system calls.
+the FORK() system call is usd to create a new child process from the parent process. after creating the child procss, both the part and child can run independently. the EXEC() system call is used to replace the current program with another program, and the new program starts running in the same process.
+b. explain the role of the WAIT() system call.
+the WAIT() system call makes the parent process wait until the child process finishes its execution. this lps the parent andhild processes wok in the correct order and also prevents unused child processes from remaining in the system.
+c. write a system call sequence using FORK(), EXEC(), and WAIT().
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main()
+{
+    pid_t pid;
+
+    pid = FORK();
+
+    if(pid == 0)
+    {
+        EXEC("/bin/ls", "ls", NULL);
+    }
+    else
+    {
+        WAIT(NULL);
+        printf("child process completed");
+    }
+
+    return 0;
+}
+question 5
+a. explain the importance of file management in an operating system.
+file management is important because it helps the operating system organize and store files in a proper way. it allows users to create, read, update, and delete files easily. it also protects files from unauthorizd access, manages storage space efficiently, and makes it easier to find and use files whenever they are needed.
+b. state the purpose of the OPEN() and CLOSE() system calls.
+the OPEN() system call is used to open an existing file or create a new file so that data can be read or written. the CLOSE() system call is used to close the file after all operations are completed. closing the file also releases the system resources used by that file.
+c. write a c-based system call sequence to open a file, read its contents, and close it.
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+
+int main()
+{
+    int fd;
+    char buffer[100];
+
+    fd = OPEN("student.txt", O_RDONLY);
+
+    READ(fd, buffer, 100);
+
+    printf("%s", buffer);
+
+    CLOSE(fd);
+
+    return 0;
+}
