@@ -1,0 +1,66 @@
+Q1. Deadlock Debugging
+
+Cause of Deadlock
+•P1 locks R1 and waits for R2.
+•P2 locks R2 and waits for R1.
+•Each process waits for the resource held by the other (circular wait), causing a deadlock.
+
+Optimization:
+Acquire resources in the same order in both processes.
+
+Corrected Pseudo Code
+Process P1:
+lock(R1)
+lock(R2)
+critical section
+unlock(R2)
+unlock(R1)
+
+Process P2:
+lock(R1)
+lock(R2)
+critical section
+unlock(R2)
+unlock(R1)
+
+Q2. CPU Utilization Problem 
+
+Cause:
+•Processes repeatedly move between Ready and Waiting due to frequent I/O operations.
+•CPU stays idle while processes wait for I/O, resulting in 30% CPU utilization.
+
+Optimization:
+•Use asynchronous I/O or I/O buffering.
+•Increase multiprogramming so another process can use the CPU while one waits.
+
+Q3. Memory Bottleneck Debugging 
+
+Cause:
+•Frequent page faults due to large heap usage (150 MB) and many threads (25 stacks).
+•Excessive memory accesses reduce performance.
+
+Optimizations:
+•Reduce memory usage (optimize heap allocation).
+•Reduce the number of threads or use a thread pool.
+
+Q4. Starvation Debugging
+
+Cause:
+•Process P5 is in Q3 (lowest priority).
+•Higher-priority queues (Q1 and Q2) continuously receive processes.
+•P5 never gets CPU time (starvation).
+
+Optimization
+•Apply Aging (gradually increase the priority of waiting processes).
+•Allocate CPU time periodically to lower-priority queues.
+
+Q5. Context-Switch Overhead Debugging
+
+Cause:
+•Very small time quantum (1 ms).
+•Average burst time is 2 ms, so threads are preempted frequently.
+•High I/O activity also causes many context switches.
+
+Optimizations
+•Increase the time quantum (e.g., 4–5 ms).
+•Reduce unnecessary context switches using I/O batching or improve I/O efficiency.
