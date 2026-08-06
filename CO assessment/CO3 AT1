@@ -1,0 +1,192 @@
+PROGRAM 1 :
+
+#include <stdio.h>
+int main()
+{
+    int base, limit, logical, physical;
+    printf("Enter Base Register: ");
+    scanf("%d", &base);
+    printf("Enter Limit Register: ");
+    scanf("%d", &limit);
+    printf("Enter Logical Address: ");
+    scanf("%d", &logical);
+    if(logical >= 0 && logical < limit)
+    {
+        physical = base + logical;
+        printf("\nValid Address\n");
+        printf("Physical Address = %d\n", physical);
+    }
+    else
+    {
+        printf("\nInvalid Logical Address! Access Denied.\n");
+    }
+    return 0;
+}
+
+OUTPUT FOR PRGM 1 :
+
+Enter Base Register: 1000
+Enter Limit Register: 500
+Enter Logical Address: 250
+
+Valid Address
+Physical Address = 1250
+
+=== CODE EXECUTION SUCCESSFULLY ===
+
+PROGRAM 2 :
+
+#include <stdio.h>
+int main()
+{
+    int pageTable[20];
+    int n, pageSize, pageNo, offset;
+    int frameNo, physicalAddress;
+    printf("Enter number of pages: ");
+    scanf("%d",&n);
+    printf("Enter page size: ");
+    scanf("%d",&pageSize);
+    printf("Enter frame number for each page:\n");
+    for(int i=0;i<n;i++)
+    {
+        printf("Page %d : ",i);
+        scanf("%d",&pageTable[i]);
+    }
+    printf("Enter Page Number: ");
+    scanf("%d",&pageNo);
+    printf("Enter Offset: ");
+    scanf("%d",&offset);
+    if(pageNo>=0 && pageNo<n && offset<pageSize)
+    {
+        frameNo=pageTable[pageNo];
+        physicalAddress=(frameNo*pageSize)+offset;
+        printf("\nFrame Number = %d",frameNo);
+        printf("\nPhysical Address = %d\n",physicalAddress);
+    }
+    else
+    {
+        printf("\nInvalid Page Number or Offset\n");
+    }
+    return 0;
+}
+
+OUTPUT FOR PRGM 2 : 
+
+Enter number of pages: 4
+Enter page size: 1024
+Enter frame number for each page:
+Page 0 : 5
+Page 1 : 8
+Page 2 : 3
+Page 3 : 10
+Enter Page Number: 2
+Enter Offset: 100
+
+Frame Number = 3
+Physical Address = 3172
+
+=== CODE EXECUTION SUCCESSFULLY ===
+
+PROGRAM 3 : 
+
+#include <stdio.h>
+int main()
+{
+    int pageTable[20];
+    int pages,pageNo;
+    printf("Enter number of pages: ");
+    scanf("%d",&pages);
+    printf("Enter Frame Number for each Page:\n");
+    for(int i=0;i<pages;i++)
+    {
+        printf("Page %d -> Frame : ",i);
+        scanf("%d",&pageTable[i]);
+    }
+    printf("Enter Logical Page Number: ");
+    scanf("%d",&pageNo);
+    if(pageNo>=0 && pageNo<pages)
+        printf("\nLogical Page %d maps to Frame %d\n",pageNo,pageTable[pageNo]);
+    else
+        printf("\nInvalid Page Number\n");
+    return 0;
+}
+
+OUTPUT FOR PRGM 3 :
+
+Enter number of pages: 5
+Enter Frame Number for each Page:
+Page 0 -> Frame : 4
+Page 1 -> Frame : 2
+Page 2 -> Frame : 7
+Page 3 -> Frame : 1
+Page 4 -> Frame : 9
+Enter Logical Page Number: 3
+
+Logical Page 3 maps to Frame 1
+
+=== CODE EXECUTION SUCCESSFULLY ===
+
+PROGRAM 4 :
+
+#include <stdio.h>
+int main()
+{
+    float memoryAccessTime, tlbAccessTime;
+    float hitRatio, withoutTLB, withTLB;
+    printf("Enter Memory Access Time (ns): ");
+    scanf("%f",&memoryAccessTime);
+    printf("Enter TLB Access Time (ns): ");
+    scanf("%f",&tlbAccessTime);
+    printf("Enter TLB Hit Ratio (0 to 1): ");
+    scanf("%f",&hitRatio);
+    withoutTLB = 2 * memoryAccessTime;
+    withTLB = hitRatio * (tlbAccessTime + memoryAccessTime)
+            + (1-hitRatio) * (tlbAccessTime + 2*memoryAccessTime);
+    printf("\nWithout TLB = %.2f ns",withoutTLB);
+    printf("\nWith TLB = %.2f ns\n",withTLB);
+    return 0;
+}
+
+OUTPUT FOR PRGM 4 :
+
+Enter Memory Access Time (ns): 100
+Enter TLB Access Time (ns): 20
+Enter TLB Hit Ratio (0 to 1): 0.8
+
+Without TLB = 200.00 ns
+With TLB = 140.00 ns
+
+PROGRAM 5 :
+
+#include <stdio.h>
+int main()
+{
+    int base, limit, logicalAddress;
+    printf("Enter Base Register: ");
+    scanf("%d",&base);
+    printf("Enter Limit Register: ");
+    scanf("%d",&limit);
+    printf("Enter Logical Address: ");
+    scanf("%d",&logicalAddress);
+    if(logicalAddress>=0 && logicalAddress<limit)
+    {
+        printf("\nAccess Granted\n");
+        printf("Physical Address = %d\n",base+logicalAddress);
+    }
+    else
+    {
+        printf("\nAccess Denied! Invalid Address\n");
+    }
+    return 0;
+}
+
+OUTPUT FOR PRGM 5 :
+
+Enter Base Register: 500
+Enter Limit Register: 300
+Enter Logical Address: 200
+
+Access Granted
+Physical Address = 700
+
+=== CODE EXECUTION SUCCESSFULLY ===
