@@ -1,0 +1,324 @@
+Q1.)#include<stdio.h>
+#define M 1000
+
+int main(){
+ int d[M]={0},n,s,m,i,j,c=0,k=-1;
+
+ printf("Enter total number of disk blocks: "); scanf("%d",&n);
+ printf("Enter file size (number of blocks): "); scanf("%d",&s);
+ printf("\n1. Contiguous\n2. Linked\n3. Indexed\nEnter allocation method: ");
+ scanf("%d",&m);
+
+ if(s<=0||s>n){printf("Invalid file size.\n");return 0;}
+
+ if(m==1){
+  for(i=0;i<=n-s;i++){
+   for(j=i;j<i+s&&d[j]==0;j++);
+   if(j==i+s){k=i;break;}
+  }
+  if(k<0) printf("\nContiguous allocation failed.\nSufficient continuous space is not available.\n");
+  else{
+   printf("\nAllocated blocks: ");
+   for(i=k;i<k+s;i++) d[i]=1,printf("%d ",i);
+   printf("\n");
+  }
+ }
+ else if(m==2){
+  printf("\nAllocated blocks: ");
+  for(i=0;i<n&&c<s;i++) if(!d[i]) d[i]=1,printf("%d ",i),c++;
+  if(c<s) printf("\nAllocation failed. Not enough free blocks.\n");
+  else printf("\nLinked allocation successful.\n");
+ }
+ else if(m==3){
+  if(s+1>n){printf("\nIndexed allocation failed.\nNot enough blocks for index block and data blocks.\n");return 0;}
+  for(i=0;i<n;i++) if(!d[i]){k=i;d[i]=1;break;}
+  printf("\nIndex block: %d",k);
+  printf("\nAllocated data blocks: ");
+  for(i=0;i<n&&c<s;i++) if(!d[i]) d[i]=1,printf("%d ",i),c++;
+  if(c<s) printf("\nAllocation failed.\n");
+  else printf("\nIndexed allocation successful.\n");
+ }
+ else printf("\nInvalid allocation method.\n");
+
+ return 0;
+}
+
+
+
+Q2.)#include<stdio.h>
+#define M 1000
+
+int main(){
+ int b[M],n,i,r,c=0,x,q;
+
+ printf("Enter total number of disk blocks: "); scanf("%d",&n);
+ printf("Enter bitmap (0 = free, 1 = allocated):\n");
+ for(i=0;i<n;i++) scanf("%d",&b[i]);
+
+ printf("\nInitial Bitmap:\n");
+ for(i=0;i<n;i++) printf("%d ",b[i]);
+
+ printf("\n\nEnter number of blocks to allocate: "); scanf("%d",&r);
+ for(i=0;i<n;i++) if(!b[i]) c++;
+
+ if(c<r) printf("Allocation failed.\nOnly %d free blocks are available.\n",c);
+ else{
+  for(i=c=0;i<n&&c<r;i++) if(!b[i]) b[i]=1,c++;
+  printf("Allocation successful.\nUpdated Bitmap after allocation:\n");
+  for(i=0;i<n;i++) printf("%d ",b[i]);
+ }
+
+ printf("\n\nEnter number of blocks to deallocate: "); scanf("%d",&q);
+ printf("Enter block numbers to deallocate:\n");
+
+ while(q--){
+  scanf("%d",&x);
+  if(x>=0&&x<n){
+   if(b[x]) b[x]=0,printf("Block %d deallocated.\n",x);
+   else printf("Block %d is already free.\n",x);
+  }else printf("Invalid block number: %d\n",x);
+ }
+
+ printf("\nFinal Bitmap:\n");
+ for(i=0;i<n;i++) printf("%d ",b[i]);
+ printf("\n");
+
+ return 0;
+}
+
+
+
+Q3.)#include<stdio.h>
+#include<stdlib.h>
+#define M 100
+
+void fcfs(int a[],int n,int h){
+ int i,s=0;
+ printf("\nFCFS Seek Sequence: %d",h);
+ for(i=0;i<n;i++) s+=abs(h-a[i]),h=a[i],printf(" -> %d",h);
+ printf("\nTotal Seek Time = %d\n",s);
+}
+
+void sstf(int a[],int n,int h){
+ int v[M]={0},i,k,p,d,s=0;
+ printf("\nSSTF Seek Sequence: %d",h);
+ for(k=0;k<n;k++){
+  for(i=0,d=99999;i<n;i++)
+   if(!v[i]&&abs(h-a[i])<d)d=abs(h-a[i]),p=i;
+  v[p]=1;s+=abs(h-a[p]);h=a[p];printf(" -> %d",h);
+ }
+ printf("\nTotal Seek Time = %d\n",s);
+}
+
+void scan(int a[],int n,int h,int z){
+ int l[M],r[M],nl=0,nr=0,i,j,t,s=0;
+ for(i=0;i<n;i++) if(a[i]<h)l[nl++]=a[i];else r[nr++]=a[i];
+
+ for(i=0;i<nl-1;i++)for(j=i+1;j<nl;j++)if(l[i]>l[j])
+  t=l[i],l[i]=l[j],l[j]=t;
+ for(i=0;i<nr-1;i++)for(j=i+1;j<nr;j++)if(r[i]>r[j])
+  t=r[i],r[i]=r[j],r[j]=t;
+
+ printf("\nSCAN Seek Sequence: %d",h);
+ for(i=0;i<nr;i++)s+=abs(h-r[i]),h=r[i],printf(" -> %d",h);
+ s+=abs(h-z+1);h=z-1;printf(" -> %d",h);
+ for(i=nl-1;i>=0;i--)s+=abs(h-l[i]),h=l[i],printf(" -> %d",h);
+ printf("\nTotal Seek Time = %d\n",s);
+}
+
+int main(){
+ int a[M],n,h,z,i;
+ printf("Enter number of disk requests: ");scanf("%d",&n);
+ printf("Enter request queue:\n");
+ for(i=0;i<n;i++)scanf("%d",&a[i]);
+ printf("Enter initial head position: ");scanf("%d",&h);
+ printf("Enter disk size: ");scanf("%d",&z);
+
+ fcfs(a,n,h);sstf(a,n,h);scan(a,n,h,z);
+ printf("\nComparison: Lower seek time means better performance.\n");
+ return 0;
+}
+
+
+
+Q4.)#include<stdio.h>
+#include<stdlib.h>
+#define M 100
+
+void cscan(int a[],int n,int h,int z,int d){
+ int l[M],r[M],nl=0,nr=0,i,j,t,s=0;
+ for(i=0;i<n;i++)if(a[i]<h)l[nl++]=a[i];else r[nr++]=a[i];
+
+ for(i=0;i<nl-1;i++)for(j=i+1;j<nl;j++)if(l[i]>l[j])
+  t=l[i],l[i]=l[j],l[j]=t;
+ for(i=0;i<nr-1;i++)for(j=i+1;j<nr;j++)if(r[i]>r[j])
+  t=r[i],r[i]=r[j],r[j]=t;
+
+ printf("\nC-SCAN Seek Sequence: %d",h);
+
+ if(d){
+  for(i=0;i<nr;i++)s+=abs(h-r[i]),h=r[i],printf(" -> %d",h);
+  s+=abs(h-z+1);h=z-1;printf(" -> %d",h);
+  s+=z-1;h=0;printf(" -> %d",h);
+  for(i=0;i<nl;i++)s+=abs(h-l[i]),h=l[i],printf(" -> %d",h);
+ }else{
+  for(i=nl-1;i>=0;i--)s+=abs(h-l[i]),h=l[i],printf(" -> %d",h);
+  s+=h;h=0;printf(" -> %d",h);
+  s+=z-1;h=z-1;printf(" -> %d",h);
+  for(i=nr-1;i>=0;i--)s+=abs(h-r[i]),h=r[i],printf(" -> %d",h);
+ }
+ printf("\nTotal C-SCAN Head Movement = %d\n",s);
+}
+
+void look(int a[],int n,int h,int d){
+ int l[M],r[M],nl=0,nr=0,i,j,t,s=0;
+ for(i=0;i<n;i++)if(a[i]<h)l[nl++]=a[i];else r[nr++]=a[i];
+
+ for(i=0;i<nl-1;i++)for(j=i+1;j<nl;j++)if(l[i]>l[j])
+  t=l[i],l[i]=l[j],l[j]=t;
+ for(i=0;i<nr-1;i++)for(j=i+1;j<nr;j++)if(r[i]>r[j])
+  t=r[i],r[i]=r[j],r[j]=t;
+
+ printf("\nLOOK Seek Sequence: %d",h);
+
+ if(d){
+  for(i=0;i<nr;i++)s+=abs(h-r[i]),h=r[i],printf(" -> %d",h);
+  for(i=nl-1;i>=0;i--)s+=abs(h-l[i]),h=l[i],printf(" -> %d",h);
+ }else{
+  for(i=nl-1;i>=0;i--)s+=abs(h-l[i]),h=l[i],printf(" -> %d",h);
+  for(i=0;i<nr;i++)s+=abs(h-r[i]),h=r[i],printf(" -> %d",h);
+ }
+ printf("\nTotal LOOK Head Movement = %d\n",s);
+}
+
+int main(){
+ int a[M],n,h,z,d,i;
+ printf("Enter number of disk requests: ");scanf("%d",&n);
+ printf("Enter request queue:\n");
+ for(i=0;i<n;i++)scanf("%d",&a[i]);
+ printf("Enter initial head position: ");scanf("%d",&h);
+ printf("Enter disk size: ");scanf("%d",&z);
+ printf("Enter direction (1 = Right, 0 = Left): ");scanf("%d",&d);
+
+ cscan(a,n,h,z,d);look(a,n,h,d);
+ printf("\nComparison: Lower head movement means better efficiency.\n");
+ return 0;
+}
+
+
+
+Q5.)#include<stdio.h>
+#include<stdlib.h>
+#define M 1000
+
+int d[M];
+
+void reset(int n){
+ int i;
+ for(i=0;i<n;i++)d[i]=0;
+}
+
+int con(int n,int s,int b[]){
+ int i,j;
+ for(i=0;i<=n-s;i++){
+  for(j=i;j<i+s&&d[j]==0;j++);
+  if(j==i+s){
+   for(j=0;j<s;j++)d[i+j]=1,b[j]=i+j;
+   return s;
+  }
+ }
+ return 0;
+}
+
+int ind(int n,int s,int b[]){
+ int i,c=0;
+ if(s+1>n)return 0;
+ for(i=0;i<n;i++)if(!d[i]){d[i]=1;break;}
+ for(i=0;i<n&&c<s;i++)if(!d[i])d[i]=1,b[c++]=i;
+ return c==s?s:0;
+}
+
+int fcfs(int a[],int n,int h){
+ int i,s=0;
+ printf("Seek Sequence: %d",h);
+ for(i=0;i<n;i++)s+=abs(h-a[i]),h=a[i],printf(" -> %d",h);
+ printf("\nTotal Seek Time = %d\n",s);
+ return s;
+}
+
+int sstf(int a[],int n,int h){
+ int v[M]={0},i,k,p,d,s=0;
+ printf("Seek Sequence: %d",h);
+ for(k=0;k<n;k++){
+  for(i=0,d=999999;i<n;i++)
+   if(!v[i]&&abs(h-a[i])<d)d=abs(h-a[i]),p=i;
+  v[p]=1;s+=abs(h-a[p]);h=a[p];printf(" -> %d",h);
+ }
+ printf("\nTotal Seek Time = %d\n",s);
+ return s;
+}
+
+void show(int b[],int n){
+ int i;
+ printf("Allocated Blocks: ");
+ for(i=0;i<n;i++)printf("%d ",b[i]);
+ printf("\n");
+}
+
+int main(){
+ int n,s,a[M],rq,h,b[M],x,cf,cs,ifc,isf,best,ch,i;
+
+ printf("Enter total number of disk blocks: ");scanf("%d",&n);
+ printf("Enter file size: ");scanf("%d",&s);
+ printf("Enter number of disk requests: ");scanf("%d",&rq);
+ printf("Enter disk request queue:\n");
+ for(i=0;i<rq;i++)scanf("%d",&a[i]);
+ printf("Enter initial head position: ");scanf("%d",&h);
+
+ reset(n);x=con(n,s,b);
+ printf("\n====================================\nContiguous + FCFS\n====================================\n");
+ if(!x)printf("Allocation failed.\n"),cf=999999;
+ else show(b,x),cf=fcfs(b,x,h);
+
+ reset(n);x=con(n,s,b);
+ printf("\n====================================\nContiguous + SSTF\n====================================\n");
+ if(!x)printf("Allocation failed.\n"),cs=999999;
+ else show(b,x),cs=sstf(b,x,h);
+
+ reset(n);x=ind(n,s,b);
+ printf("\n====================================\nIndexed + FCFS\n====================================\n");
+ if(!x)printf("Allocation failed.\n"),ifc=999999;
+ else show(b,x),ifc=fcfs(b,x,h);
+
+ reset(n);x=ind(n,s,b);
+ printf("\n====================================\nIndexed + SSTF\n====================================\n");
+ if(!x)printf("Allocation failed.\n"),isf=999999;
+ else show(b,x),isf=sstf(b,x,h);
+
+ printf("\n====================================\nPERFORMANCE COMPARISON\n====================================\n");
+
+ printf("Contiguous + FCFS : ");
+ cf==999999?printf("Allocation Failed\n"):printf("%d seek time\n",cf);
+ printf("Contiguous + SSTF : ");
+ cs==999999?printf("Allocation Failed\n"):printf("%d seek time\n",cs);
+ printf("Indexed + FCFS    : ");
+ ifc==999999?printf("Allocation Failed\n"):printf("%d seek time\n",ifc);
+ printf("Indexed + SSTF    : ");
+ isf==999999?printf("Allocation Failed\n"):printf("%d seek time\n",isf);
+
+ best=cf;ch=1;
+ if(cs<best)best=cs,ch=2;
+ if(ifc<best)best=ifc,ch=3;
+ if(isf<best)best=isf,ch=4;
+
+ if(best==999999)printf("\nNo valid allocation was possible.\n");
+ else{
+  printf("\nBest Combination: ");
+  if(ch==1)printf("Contiguous + FCFS");
+  else if(ch==2)printf("Contiguous + SSTF");
+  else if(ch==3)printf("Indexed + FCFS");
+  else printf("Indexed + SSTF");
+  printf("\nMinimum Seek Time = %d\n",best);
+ }
+ return 0;
+}
