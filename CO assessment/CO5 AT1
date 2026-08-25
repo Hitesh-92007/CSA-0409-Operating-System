@@ -43,9 +43,9 @@ The proposed layout separates the operating system, user files, and frequently c
 The reserved 8 GB provides a safety margin for unexpected growth and future requirements. Regular monitoring using df and du allows storage problems to be detected before they affect critical services.
 7. Conclusion
 The proposed 50 GB Linux file system layout provides efficient storage management and improves system stability. Separating the root, home, and var partitions prevents rapidly growing files from consuming all available space. Logrotate controls the growth of log files and keeps them within the required 10 GB limit.
-By combining proper partitioning, log rotation, storage monitoring, and reserved free space, the server can continue running critical services without interruption caused by disk space exhaustion.
-1. Q2
-Problem Analysis
+By combining proper partitioning, log rotation, storage monitoring, and reserved free space, the server can continue running critical services without interruption caused by disk space exhaustion. 
+
+Q2 : Problem Analysis
 The Linux system is handling high CPU workloads, which causes many processes and threads to compete for CPU time. The CPU frequently switches from one process to another, which is called context switching. During a context switch, the operating system saves the state of the current process and loads the state of another process. This requires CPU time and creates overhead. Frequent context switching reduces the time available for actual processing and can increase delays in real time applications. Since hardware upgrades are not possible, kernel level optimization can be used to improve CPU performance and reduce scheduling delays.
 2. Scheduler Tuning
 The Linux scheduler decides which process or thread should use the CPU. Scheduler tuning can improve performance by giving higher priority to important processes and reducing unnecessary switching. Real time scheduling policies such as SCHED_FIFO and SCHED_RR can be used for applications that require fast and predictable responses.
@@ -71,8 +71,8 @@ Unnecessary background activities should also be minimized so that critical real
 These techniques can reduce unnecessary context switching and process migration, improve CPU utilization, and reduce response time. Critical real time processes can receive CPU time more quickly and predictably.
 9. Conclusion
 Since hardware upgrades are not possible, kernel level optimization is an effective solution for improving the Linux system. Scheduler tuning, CPU affinity, proper process priorities, reduced thread creation, and real time kernel configuration can reduce context switching overhead and improve response time. Kernel modules can provide additional monitoring and specialized functionality. Therefore, these techniques can improve overall system performance while supporting real time processing.
-1. Q3
-Problem Analysis
+
+Q3 : Problem Analysis
 The administrator needs to process 1 million log entries every day using only shell scripting. The main requirement is that the complete processing should finish within 2 minutes. Processing each log entry individually using a shell loop can be slow because every iteration creates additional shell processing overhead. Therefore, optimized Linux commands should be used to process large amounts of data efficiently.
 2. Efficient Shell Script
 Assume the log file is named server.log and each entry contains a status field. The following script counts the different status values:
@@ -125,9 +125,9 @@ The script should avoid processing every entry using a shell loop. It should min
 The actual execution time depends on the size of each log entry, CPU performance, RAM, storage speed, and the complexity of the processing. The script should therefore be tested with a representative 1 million entry log file to verify that it completes within the required 2 minutes.
 10. Conclusion
 The most efficient approach is to use awk as the main processing command and use grep only when filtering is required. Pipelines should be used to avoid unnecessary temporary files, while unnecessary sorting and shell loops should be avoided. If required, controlled parallel processing can be used on multi-core systems.
-This approach reduces shell overhead, minimizes disk operations, uses CPU resources efficiently, and provides a practical solution for processing 1 million log entries within the required 2 minute limit.
-1. Q4
-Problem Analysis
+This approach reduces shell overhead, minimizes disk operations, uses CPU resources efficiently, and provides a practical solution for processing 1 million log entries within the required 2 minute limit. 
+
+Q4 : Problem Analysis
 The Linux system is running several background services, but one faulty process is consuming about 90 percent of the CPU. This can reduce the CPU resources available to other services and may cause slow system performance. The system should not be restarted because critical services must continue operating. Therefore, the faulty process should be identified, monitored, and controlled without affecting important services.
 2. Identify the Faulty Process
 The top command can be used to identify processes that are consuming high CPU resources.
@@ -167,8 +167,8 @@ The administrator should confirm that CPU usage has decreased and that critical 
 The recommended strategy is to first identify the high CPU process using top or ps, then monitor it to confirm the problem. If it is safe to control, its priority should initially be reduced using renice. If the process continues to cause problems, it should be terminated using kill. The kill -9 command should only be used as a last resort.
 9. Conclusion
 The faulty process can be managed without restarting the Linux system. Using top and ps allows the administrator to identify and monitor the process. renice can reduce its CPU priority while keeping it running, and kill can terminate it if necessary. Checking service status before taking action ensures that critical services remain unaffected. This approach restores CPU availability while maintaining system stability and continuous operation.
-1. Q5
-Problem Analysis
+
+Q5 : Problem Analysis
 The physical server has 16 GB of RAM. Five virtual machines are required, and each VM needs a minimum of 2 GB. The host operating system itself requires 4 GB.
 The minimum RAM required by the virtual machines is:
 5 × 2 GB = 10 GB
