@@ -1,0 +1,215 @@
+Q1: Scenario Analysis
+
+The server has a total storage capacity of 50 GB and needs to store system logs, user files, and application data. Since these files can grow continuously, using a single partition can cause one type of data to consume all available disk space.
+If the disk becomes full, Linux may not be able to write new files or logs. This can cause critical services and applications to stop working. Therefore, the storage should be divided into separate partitions to improve space management and system stability.
+2. Optimized Linux File System Layout
+A suitable 50 GB layout is:
+Boot partition: 1 GB
+The boot partition stores the files required to start the Linux operating system.
+Root partition: 12 GB
+The root partition stores the Linux operating system, system files, libraries, and installed software. Keeping it separate from user files and logs prevents these files from consuming the entire system partition.
+Home partition: 15 GB
+The home partition stores user files and personal data. Separating it from the root partition protects the operating system if user files grow rapidly.
+Var partition: 10 GB
+The var partition stores frequently changing data such as system logs, application logs, caches, and other variable data. Keeping this partition separate prevents rapidly growing logs from filling the root partition.
+Swap space: 4 GB
+Swap provides additional virtual memory when the available RAM is insufficient. It helps maintain system stability during periods of high memory usage.
+Reserved free space: 8 GB
+The remaining 8 GB is kept available for future expansion and emergency requirements. This prevents the server from operating continuously at maximum disk capacity.
+3. Log File Management
+The log files must not exceed 10 GB. Linux provides the logrotate utility to automatically manage growing log files.
+Logrotate can periodically rotate, compress, and delete old log files. This prevents old logs from continuously consuming disk space.
+A simple logrotate configuration is:
+/var/log/myapp.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+}
+This configuration rotates the log every week, keeps four old log files, compresses the old logs, and removes unnecessary files.
+The administrator should also monitor the total size of the log directory and configure alerts before it reaches the 10 GB limit.
+4. Storage Monitoring
+The df command can be used to monitor the available disk space.
+df -h
+The du command can be used to identify directories that are consuming large amounts of storage.
+du -sh /var/*
+These commands help the administrator identify storage problems before the disk becomes completely full.
+5. Preventing Disk Space Exhaustion
+Disk usage should be monitored regularly, and an alert should be generated when usage reaches around 80 percent. This provides enough time to remove unnecessary files, rotate logs, or increase storage.
+Separating the var partition from the root partition is also important. If log files consume the available space in var, the root partition can still have free space for essential operating system operations.
+6. Justification
+The proposed layout separates the operating system, user files, and frequently changing application and log data. The separate var partition provides controlled storage for logs and application data, while logrotate prevents old logs from continuously increasing in size.
+The reserved 8 GB provides a safety margin for unexpected growth and future requirements. Regular monitoring using df and du allows storage problems to be detected before they affect critical services.
+7. Conclusion
+The proposed 50 GB Linux file system layout provides efficient storage management and improves system stability. Separating the root, home, and var partitions prevents rapidly growing files from consuming all available space. Logrotate controls the growth of log files and keeps them within the required 10 GB limit.
+By combining proper partitioning, log rotation, storage monitoring, and reserved free space, the server can continue running critical services without interruption caused by disk space exhaustion.
+1. Q2
+Problem Analysis
+The Linux system is handling high CPU workloads, which causes many processes and threads to compete for CPU time. The CPU frequently switches from one process to another, which is called context switching. During a context switch, the operating system saves the state of the current process and loads the state of another process. This requires CPU time and creates overhead. Frequent context switching reduces the time available for actual processing and can increase delays in real time applications. Since hardware upgrades are not possible, kernel level optimization can be used to improve CPU performance and reduce scheduling delays.
+2. Scheduler Tuning
+The Linux scheduler decides which process or thread should use the CPU. Scheduler tuning can improve performance by giving higher priority to important processes and reducing unnecessary switching. Real time scheduling policies such as SCHED_FIFO and SCHED_RR can be used for applications that require fast and predictable responses.
+SCHED_FIFO allows a high priority process to continue running until it finishes, blocks, or a higher priority process becomes ready. SCHED_RR gives processes with the same priority a fixed time period to execute before another process gets CPU time.
+3. CPU Affinity
+CPU affinity allows a process to run on a specific CPU core. This can reduce unnecessary movement of processes between CPU cores and improve CPU cache usage.
+For example:
+taskset -c 2 ./application
+This runs the application on CPU core 2. CPU affinity can reduce process migration and improve performance during heavy workloads.
+4. Process Priority
+Important real time processes should be given higher priority than less important background processes. Linux provides priority mechanisms that allow the scheduler to give CPU time to critical tasks first.
+However, all processes should not be given high priority because this can affect system stability and prevent other necessary processes from receiving CPU time.
+5. Reducing Context Switching
+Unnecessary processes and threads should be avoided. Creating too many threads increases scheduling overhead and causes more context switching. The application should use an appropriate number of worker threads based on the available CPU cores.
+Unnecessary background services can also be disabled so that more CPU resources are available for critical real time tasks.
+6. Use of Kernel Modules
+Kernel modules allow additional functionality to be added to the Linux kernel without rebuilding the complete kernel. A kernel module can be used to monitor CPU usage, scheduling activity, or provide specialized functionality required by the application.
+Kernel modules must be carefully designed because they operate at the kernel level. An error in a kernel module can affect the stability of the entire system.
+7. Real Time Kernel Optimization
+For applications that require predictable response times, a real time capable Linux kernel can be used. Kernel configuration can be optimized to reduce scheduling latency and improve the response time of high priority processes.
+Unnecessary background activities should also be minimized so that critical real time processes can receive CPU time without unnecessary delays.
+8. Expected Result
+These techniques can reduce unnecessary context switching and process migration, improve CPU utilization, and reduce response time. Critical real time processes can receive CPU time more quickly and predictably.
+9. Conclusion
+Since hardware upgrades are not possible, kernel level optimization is an effective solution for improving the Linux system. Scheduler tuning, CPU affinity, proper process priorities, reduced thread creation, and real time kernel configuration can reduce context switching overhead and improve response time. Kernel modules can provide additional monitoring and specialized functionality. Therefore, these techniques can improve overall system performance while supporting real time processing.
+1. Q3
+Problem Analysis
+The administrator needs to process 1 million log entries every day using only shell scripting. The main requirement is that the complete processing should finish within 2 minutes. Processing each log entry individually using a shell loop can be slow because every iteration creates additional shell processing overhead. Therefore, optimized Linux commands should be used to process large amounts of data efficiently.
+2. Efficient Shell Script
+Assume the log file is named server.log and each entry contains a status field. The following script counts the different status values:
+#!/bin/bash
+awk '{count[$3]++} END {
+    for (status in count)
+        print status, count[status]
+}' server.log
+Expected input:
+10:20:01 user1 ERROR
+10:20:05 user2 OK
+10:20:10 user3 ERROR
+10:20:15 user4 OK
+10:20:20 user5 WARNING
+Expected output:
+ERROR 2
+OK 2
+WARNING 1
+3. Use of awk
+awk is the main command used because it can read and process the log file efficiently without requiring a separate shell operation for every line. It can filter records, extract fields, perform calculations, and count values in a single process.
+For 1 million entries, awk is generally more efficient than using a shell while loop because the shell does not have to repeatedly interpret commands for every log entry.
+4. Use of grep
+If only specific entries need to be processed, grep can be used to filter the required records.
+grep "ERROR" server.log | awk '{count[$3]++} END {for (x in count) print x, count[x]}'
+grep quickly filters the required lines, and awk processes only the selected records. This reduces the amount of data that needs to be processed.
+5. Avoiding Unnecessary Commands
+Commands should not be used when their work can already be performed by awk. For example, unnecessary combinations of grep, cut, sort, and uniq can create additional processes and increase processing time.
+awk can perform filtering, field extraction, and counting in one operation. This reduces process creation and data transfer between commands.
+6. Avoiding Temporary Files
+Temporary files should be avoided wherever possible. Pipelines allow the output of one command to be directly passed to another command.
+grep "ERROR" server.log | awk '{count[$3]++} END {for (x in count) print x, count[x]}'
+This reduces unnecessary disk input and output operations and improves performance.
+7. Parallel Processing
+If the log file is extremely large and the server has multiple CPU cores, the file can be divided into smaller sections and processed simultaneously.
+split -n l/4 server.log log_part_
+for file in log_part_*
+do
+    awk '{count[$3]++} END {for (x in count) print x, count[x]}' "$file" &
+done
+wait
+The ampersand allows multiple processes to run at the same time. However, the number of parallel processes should be limited according to the available CPU cores because too many processes can increase context switching and reduce performance.
+8. Justification of Commands
+awk is used for efficient text processing, filtering, field extraction, and counting in a single process.
+grep is used when only specific log entries need to be selected, reducing the amount of data processed.
+wc can be used for simple line counting because it is highly optimized for counting text.
+sort should only be used when ordering is actually required because sorting 1 million records requires additional CPU and memory.
+cut is useful for simple field extraction, but awk is preferred when multiple operations are required.
+9. Performance Optimization
+The script should avoid processing every entry using a shell loop. It should minimize disk input and output, avoid unnecessary temporary files, avoid unnecessary sorting, and use commands capable of processing large amounts of data efficiently.
+The actual execution time depends on the size of each log entry, CPU performance, RAM, storage speed, and the complexity of the processing. The script should therefore be tested with a representative 1 million entry log file to verify that it completes within the required 2 minutes.
+10. Conclusion
+The most efficient approach is to use awk as the main processing command and use grep only when filtering is required. Pipelines should be used to avoid unnecessary temporary files, while unnecessary sorting and shell loops should be avoided. If required, controlled parallel processing can be used on multi-core systems.
+This approach reduces shell overhead, minimizes disk operations, uses CPU resources efficiently, and provides a practical solution for processing 1 million log entries within the required 2 minute limit.
+1. Q4
+Problem Analysis
+The Linux system is running several background services, but one faulty process is consuming about 90 percent of the CPU. This can reduce the CPU resources available to other services and may cause slow system performance. The system should not be restarted because critical services must continue operating. Therefore, the faulty process should be identified, monitored, and controlled without affecting important services.
+2. Identify the Faulty Process
+The top command can be used to identify processes that are consuming high CPU resources.
+top
+The administrator should check the CPU percentage column and identify the process that is consistently using around 90 percent CPU. The process ID, also called PID, should be recorded.
+The ps command can also be used to find processes with high CPU usage.
+ps aux --sort=-%cpu | head
+This displays processes in descending order of CPU usage, making it easier to identify the faulty process.
+3. Monitor the Process
+After identifying the PID, the process should be monitored to confirm that it is continuously consuming excessive CPU resources.
+top -p 1234
+Here, 1234 represents the PID of the suspected process.
+Monitoring should be done before taking action because a temporary increase in CPU usage does not necessarily mean that the process is faulty.
+4. Reduce the Process Priority
+If the process is not critical, its CPU priority can be reduced using renice.
+renice 10 -p 1234
+This lowers the scheduling priority of process 1234. As a result, other important processes can receive CPU time more easily.
+This is a safer first step than immediately terminating the process because the faulty process is still allowed to run.
+5. Stop or Terminate the Faulty Process
+If reducing its priority does not solve the problem and the process is confirmed to be faulty, it can be stopped.
+A normal termination can be attempted first:
+kill 1234
+This sends a termination signal to the process and gives it an opportunity to exit properly.
+If the process does not respond and continues consuming excessive CPU, a stronger signal can be used:
+kill -9 1234
+The kill command should only be used after confirming that the process is not a critical system service.
+6. Protecting Critical Services
+Before terminating the process, the administrator should verify its name, PID, parent process, and service status. Critical services should not be terminated or have their priorities unnecessarily changed.
+Commands such as systemctl can be used to check important services.
+systemctl status service_name
+This helps ensure that the process being controlled is not required by a critical service.
+7. Continuous Monitoring
+After controlling the faulty process, CPU usage should be monitored again using top or ps.
+top
+The administrator should confirm that CPU usage has decreased and that critical services are still running normally.
+8. Process Management Strategy
+The recommended strategy is to first identify the high CPU process using top or ps, then monitor it to confirm the problem. If it is safe to control, its priority should initially be reduced using renice. If the process continues to cause problems, it should be terminated using kill. The kill -9 command should only be used as a last resort.
+9. Conclusion
+The faulty process can be managed without restarting the Linux system. Using top and ps allows the administrator to identify and monitor the process. renice can reduce its CPU priority while keeping it running, and kill can terminate it if necessary. Checking service status before taking action ensures that critical services remain unaffected. This approach restores CPU availability while maintaining system stability and continuous operation.
+1. Q5
+Problem Analysis
+The physical server has 16 GB of RAM. Five virtual machines are required, and each VM needs a minimum of 2 GB. The host operating system itself requires 4 GB.
+The minimum RAM required by the virtual machines is:
+5 × 2 GB = 10 GB
+The host operating system requires:
+4 GB
+Therefore, the total minimum requirement is:
+10 GB + 4 GB = 14 GB
+This leaves:
+16 GB − 14 GB = 2 GB
+The remaining 2 GB can be used as additional memory for virtual machines or kept as a small reserve for the host.
+2. Basic Resource Allocation
+The safest initial allocation is:
+Host operating system: 4 GB
+VM 1: 2 GB
+VM 2: 2 GB
+VM 3: 2 GB
+VM 4: 2 GB
+VM 5: 2 GB
+Reserved memory: 2 GB
+This uses 14 GB and leaves 2 GB available as a safety margin.
+3. Efficient Allocation Strategy
+Since every VM requires at least 2 GB, each VM should first be assigned its minimum 2 GB. The remaining 2 GB should not be permanently assigned immediately.
+The 2 GB reserve can be used when a particular VM temporarily requires additional memory. This prevents one VM from consuming memory that is required by the other VMs or the host operating system.
+For example, if VM 1 is running a memory intensive application, the virtualization platform can increase its memory allocation while ensuring that the host retains its required 4 GB and the other VMs retain their minimum 2 GB.
+4. Memory Management Techniques
+Memory overcommitment can be used carefully if supported by the virtualization platform. It allows the virtualization system to allocate memory more flexibly based on actual usage. However, excessive overcommitment should be avoided because it can cause swapping and reduce performance.
+Dynamic memory allocation can also be used where supported. This allows memory to be increased or decreased according to the current requirements of each VM.
+Memory ballooning is another technique in which the virtualization platform reclaims unused memory from one VM and makes it available to another VM that needs it.
+5. Recommended Allocation
+The recommended initial allocation is:
+Host operating system: 4 GB
+VM 1: 2 GB
+VM 2: 2 GB
+VM 3: 2 GB
+VM 4: 2 GB
+VM 5: 2 GB
+Reserved memory: 2 GB
+The total is 16 GB.
+6. Justification
+Giving every VM its required minimum of 2 GB ensures that all five virtual machines can operate. Reserving 2 GB prevents the host from becoming unstable when there is temporary memory demand.
+Dynamic allocation and memory management techniques can then be used to provide additional memory to VMs when required. This makes better use of the available RAM without permanently taking memory away from other VMs.
+7. Conclusion
+The 16 GB RAM should be divided carefully because the host requires 4 GB and the five VMs require at least 10 GB. After satisfying these minimum requirements, 2 GB remains available.
+Therefore, each VM should initially receive 2 GB, the host should receive 4 GB, and the remaining 2 GB should be kept as reserve memory. Dynamic memory allocation or ballooning can be used when a VM requires additional memory. This allocation ensures that all five VMs operate smoothly while maintaining sufficient memory for the host operating system.
