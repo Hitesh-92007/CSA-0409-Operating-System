@@ -1,0 +1,120 @@
+1.) File system space management
+Pseudo code:
+BEGIN
+SET threshold = 80%
+usage = GET_DISK_USAGE()
+IF usage > threshold THEN
+    PRINT "Disk usage is high"
+    log_files = GET_LOG_FILES()
+    SORT log_files BY age ASCENDING
+    FOR each file IN log_files DO
+        IF file IS old THEN
+            DELETE file
+        ELSE
+            COMPRESS file
+        ENDIF
+        usage = GET_DISK_USAGE()
+        IF usage <= threshold THEN
+            BREAK
+        ENDIF
+    ENDFOR
+    IF usage > threshold THEN
+        PRINT "Warning: Disk usage is still high"
+    ELSE
+        PRINT "Disk usage reduced successfully"
+    ENDIF
+ELSE
+    PRINT "Disk usage is normal"
+ENDIF
+END
+
+Explanation:
+The algorithm continuously checks disk usage. If usage exceeds 80%, it identifies log files and deletes old files or compresses them. It repeatedly checks the disk and stops when usage falls below 80%.
+
+2.)Priority-based CPU scheduling
+Pseudo code:
+BEGIN
+INPUT process_list
+SORT process_list BY priority DESCENDING
+WHILE process_list IS NOT EMPTY DO
+    SELECT process WITH highest priority
+    ALLOCATE CPU TIME
+    EXECUTE process
+    IF process IS completed THEN
+        REMOVE process FROM process_list
+        PRINT "Process completed"
+    ELSE
+        REDUCE priority slightly
+        ADD process BACK TO process_list
+    ENDIF
+    SORT process_list BY priority DESCENDING
+ENDWHILE
+PRINT "All processes completed"
+END
+
+Explanation:
+The algorithm sorts processes according to their priority. The process with the highest priority gets the CPU first. If it is not completed, it is placed back into the queue with a slightly reduced priority.
+
+3.)RAM management for multiple virtual machines
+Pseudo code:
+BEGIN
+SET total_RAM = 16 GB
+SET host_reserved = 4 GB
+SET min_RAM = 2 GB
+available_RAM = total_RAM - host_reserved
+INPUT number_of_VMs
+FOR i = 1 TO number_of_VMs DO
+    IF available_RAM >= min_RAM THEN
+        ALLOCATE min_RAM TO VM[i]
+        available_RAM = available_RAM - min_RAM
+        PRINT "RAM allocated to VM", i
+    ELSE
+        PRINT "Insufficient RAM for VM", i
+    ENDIF
+ENDFOR
+PRINT "Remaining RAM =", available_RAM
+END
+
+Explanation:
+The algorithm first reserves 4 GB for the host system. The remaining RAM is distributed among VMs, with each VM receiving at least 2 GB. If there is not enough RAM, the VM is not allocated memory.
+
+4.)Hypervisor selection
+Pseudo code:
+BEGIN
+INPUT performance_required
+INPUT budget
+INPUT hardware_access
+IF performance_required = HIGH
+   AND hardware_access = TRUE THEN
+    selected_hypervisor = "Type 1 Hypervisor"
+ELSE IF budget = LOW
+   AND performance_required != HIGH THEN
+    selected_hypervisor = "Type 2 Hypervisor"
+ELSE IF hardware_access = TRUE THEN
+    selected_hypervisor = "Type 1 Hypervisor"
+ELSE
+    selected_hypervisor = "Type 2 Hypervisor"
+ENDIF
+PRINT "Selected Hypervisor =", selected_hypervisor
+END
+
+Explanation:
+The algorithm selects a Type 1 hypervisor when high performance and direct hardware access are required. A Type 2 hypervisor is selected when the budget is low or direct hardware access is unavailable.
+
+5.)CPU and memory resource limiting
+Pseudo code:
+BEGIN
+INPUT application_list
+FOR each app IN application_list DO
+    CREATE cgroup FOR app
+    SET CPU_LIMIT = predefined CPU limit
+    SET MEMORY_LIMIT = predefined memory limit
+    APPLY CPU_LIMIT TO app
+    APPLY MEMORY_LIMIT TO app
+    ASSIGN app PROCESS TO cgroup
+ENDFOR
+PRINT "CPU and memory limits applied successfully"
+END
+
+Explanation:
+The algorithm creates a cgroup for each application and assigns CPU and memory limits. This prevents one application from consuming excessive resources and affecting other applications.
